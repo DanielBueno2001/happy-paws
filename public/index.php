@@ -8,7 +8,7 @@ $mensaje = "";
 $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
 if ($conn->connect_error) {
-    die("<div class='alert alert-danger'>Error de conexión: " . $conn->connect_error . "</div>");
+    die("<div class='error-message'>Error de conexión: " . $conn->connect_error . "</div>");
 }
 
 // ==============================================
@@ -17,23 +17,28 @@ if ($conn->connect_error) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Sanitizar y validar datos
     $nombre = htmlspecialchars($_POST['nombre']);
+    $apellido = htmlspecialchars($_POST['apellido']);
+    $edad = intval($_POST['edad']); // Convertir a entero
     $correo = filter_var($_POST['correo'], FILTER_SANITIZE_EMAIL);
-    $clave = htmlspecialchars($_POST['clave']); // No encriptada
-
+    
+    // Validaciones
     if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-        $mensaje = "<div class='alert alert-warning'>Correo no válido</div>";
-    } elseif (strlen($clave) < 6) {
-        $mensaje = "<div class='alert alert-warning'>La clave debe tener al menos 6 caracteres</div>";
+        $mensaje = "<div class='alert error'>Correo no válido</div>";
+    } elseif ($edad < 18 || $edad > 100) {
+        $mensaje = "<div class='alert error'>Edad debe ser entre 18 y 100 años</div>";
     } else {
+        // NO se encripta la contraseña (como solicitaste)
+        $contrasena = $_POST['contrasena'];
+        
         // Insertar con prepared statement
-        $sql = "INSERT INTO usuarios (nombre, correo, clave) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO usuarios (nombre, apellido, edad, correo, contrasena) VALUES (?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sss", $nombre, $correo, $clave); // Clave sin hash
-
+        $stmt->bind_param("ssiss", $nombre, $apellido, $edad, $correo, $contrasena);
+        
         if ($stmt->execute()) {
-            $mensaje = "<div class='alert alert-success'>¡Registro exitoso! Bienvenido/a, $nombre</div>";
+            $mensaje = "<div class='alert success'>¡Registro exitoso! Bienvenido/a, $nombre</div>";
         } else {
-            $mensaje = "<div class='alert alert-danger'>Error: " . $stmt->error . "</div>";
+            $mensaje = "<div class='alert error'>Error: " . $stmt->error . "</div>";
         }
         $stmt->close();
     }
@@ -45,51 +50,213 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Usuario</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Registro - Happy Paws</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; padding-top: 50px; }
-        .form-container { background: white; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); padding: 30px; }
+        :root {
+            --primary: #4e60ff;
+            --primary-light: #f3f4ff;
+            --success: #57c279;
+            --error: #fd6d6d;
+            --text: #2b2b43;
+            --text-light: #83859c;
+            --background: #f8f9ff;
+            --white: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .form-container {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .form-header {
+            grid-column: span 2;
+            text-align: center;
+        }
+        
+        .form-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .form-header p {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d9dbe1;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            background-color: #3a4bff;
+            transform: translateY(-2px);
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            grid-column: span 2;
+        }
+        
+        .success {
+            background-color: rgba(87, 194, 121, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(87, 194, 121, 0.3);
+        }
+        
+        .error {
+            background-color: rgba(253, 109, 109, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(253, 109, 109, 0.3);
+        }
+        
+        .form-image {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .form-image img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .form-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        @media (max-width: 768px) {
+            .form-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-header, .alert {
+                grid-column: span 1;
+            }
+            
+            .form-image {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6 form-container">
-                <h2 class="text-center mb-4">Registro de Usuario</h2>
+        <div class="form-container">
+            <div class="form-header">
+                <h2>Registro de Usuario</h2>
+                <p>Únete a nuestra comunidad y disfruta de todos los beneficios</p>
                 <?php if (!empty($mensaje)) echo $mensaje; ?>
-                
+            </div>
+            
+            <div class="form-image">
+                <img src="https://cdn-icons-png.flaticon.com/512/4205/4205843.png" alt="Registro">
+            </div>
+            
+            <div class="form-content">
                 <form method="POST" action="">
-                    <!-- Nombre -->
-                    <div class="mb-3">
-                        <label class="form-label">Nombre:</label>
-                        <input type="text" name="nombre" class="form-control" required minlength="2">
+                    <div class="form-group">
+                        <label for="nombre">Nombre:</label>
+                        <input type="text" id="nombre" name="nombre" class="form-control" required minlength="2">
                     </div>
                     
-                    <!-- Correo -->
-                    <div class="mb-3">
-                        <label class="form-label">Correo:</label>
-                        <input type="email" name="correo" class="form-control" required>
+                    <div class="form-group">
+                        <label for="apellido">Apellido:</label>
+                        <input type="text" id="apellido" name="apellido" class="form-control" required>
                     </div>
                     
-                    <!-- Clave -->
-                    <div class="mb-3">
-                        <label class="form-label">Clave (visible):</label>
-                        <input type="text" name="clave" class="form-control" required minlength="6">
-                        <small class="text-muted">La clave no está encriptada (solo para pruebas)</small>
+                    <div class="form-group">
+                        <label for="edad">Edad:</label>
+                        <input type="number" id="edad" name="edad" class="form-control" min="18" max="100" required>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary w-100">Registrarse</button>
+                    <div class="form-group">
+                        <label for="correo">Correo electrónico:</label>
+                        <input type="email" id="correo" name="correo" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contrasena">Contraseña:</label>
+                        <input type="password" id="contrasena" name="contrasena" class="form-control" required minlength="8">
+                        <small style="color: var(--text-light); font-size: 12px;">Mínimo 8 caracteres</small>
+                    </div>
+                    
+                    <button type="submit" class="btn">Registrarse</button>
                 </form>
-
-                <div class="text-center mt-3">
-                    <a href="login.php">¿Ya tienes una cuenta? Inicia sesión aquí</a>
-                </div>
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 
