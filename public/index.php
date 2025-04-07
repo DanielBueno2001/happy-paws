@@ -36,7 +36,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("ssiss", $nombre, $apellido, $edad, $correo, $contrasena);
         
         if ($stmt->execute()) {
-            $mensaje = "<div class='alert alert-success'>¡Registro exitoso! Bienvenido/a, $nombre</div>";
+            // Redirigir a video.php después de registro exitoso
+            header("Location: video.php");
+            exit();
         } else {
             $mensaje = "<div class='alert alert-danger'>Error: " . $stmt->error . "</div>";
         }
@@ -235,6 +237,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             margin-top: auto;
         }
         
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .login-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
         @media (max-width: 768px) {
             .header-image {
                 height: 200px;
@@ -366,8 +384,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     
                     <div class="col-12 text-center mt-4">
                         <button type="submit" class="btn btn-primary btn-lg px-5 py-3">
-                            <i class="fas fa-save me-2"></i>Registrarse
+                            <i class="fas fa-save me-2"></i>Registrarme
                         </button>
+                    </div>
+
+                    <div class="col-12 login-link">
+                        <p>¿Ya tienes una cuenta? <a href="login.php">Iniciar sesión</a></p>
                     </div>
                 </form>
             </section>
