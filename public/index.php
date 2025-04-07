@@ -1,88 +1,111 @@
 <?php
-// public/index.php
-require_once '../includes/config.php';
-require_once '../includes/header.php';
+// ==============================================
+// 1. CONEXIÓN A LA BASE DE DATOS (RDS)
+// ==============================================
+require_once('../includes/config.php'); // Archivo con credenciales
 
-$error = '';
-$success = '';
+$mensaje = "";
+$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre = trim($_POST['nombre'] ?? '');
-    $apellido = trim($_POST['apellido'] ?? '');
-    $edad = intval($_POST['edad'] ?? 0);
-    $correo = trim($_POST['correo'] ?? '');
-    $password = trim($_POST['password'] ?? '');
+if ($conn->connect_error) {
+    die("<div class='alert alert-danger'>Error de conexión: " . $conn->connect_error . "</div>");
+}
 
-    if (!$nombre || !$apellido || !$edad || !$correo || !$password) {
-        $error = 'Por favor, complete todos los campos.';
-    } elseif (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-        $error = 'El correo electrónico no es válido.';
+// ==============================================
+// 2. PROCESAR FORMULARIO (POST)
+// ==============================================
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Sanitizar y validar datos
+    $nombre = htmlspecialchars($_POST['nombre']);
+    $apellido = htmlspecialchars($_POST['apellido']);
+    $edad = intval($_POST['edad']); // Convertir a entero
+    $correo = filter_var($_POST['correo'], FILTER_SANITIZE_EMAIL);
+    
+    // Validaciones
+    if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+        $mensaje = "<div class='alert alert-warning'>Correo no válido</div>";
+    } elseif ($edad < 18 || $edad > 100) {
+        $mensaje = "<div class='alert alert-warning'>Edad debe ser entre 18 y 100 años</div>";
     } else {
-        $stmt = $conn->prepare("SELECT id FROM usuarios WHERE correo = ?");
-        $stmt->bind_param('s', $correo);
-        $stmt->execute();
-        $stmt->store_result();
-
-        if ($stmt->num_rows > 0) {
-            $error = 'Ya existe una cuenta con ese correo.';
+        // Encriptar contraseña
+        $contrasena = password_hash($_POST['contrasena'], PASSWORD_BCRYPT);
+        
+        // Insertar con prepared statement
+        $sql = "INSERT INTO usuarios (nombre, apellido, edad, correo, contrasena) VALUES (?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ssiss", $nombre, $apellido, $edad, $correo, $contrasena);
+        
+        if ($stmt->execute()) {
+            $mensaje = "<div class='alert alert-success'>¡Registro exitoso! Bienvenido/a, $nombre</div>";
         } else {
-            $hash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("INSERT INTO usuarios (nombre, apellido, edad, correo, password) VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param('ssiss', $nombre, $apellido, $edad, $correo, $hash);
-
-            if ($stmt->execute()) {
-                $success = '¡Registro exitoso! Ahora puedes <a href=\"login.php\">iniciar sesión</a>.';
-            } else {
-                $error = 'Error al registrar. Intente nuevamente.';
-            }
+            $mensaje = "<div class='alert alert-danger'>Error: " . $stmt->error . "</div>";
         }
         $stmt->close();
     }
 }
 ?>
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header bg-primary text-white fw-bold">Registro de Usuario</div>
-                <div class="card-body">
-                    <?php if ($error): ?>
-                        <div class="alert alert-danger"><?= $error ?></div>
-                    <?php endif; ?>
-                    <?php if ($success): ?>
-                        <div class="alert alert-success"><?= $success ?></div>
-                    <?php endif; ?>
-                    <form method="POST" action="">
-                        <div class="mb-3">
-                            <label for="nombre" class="form-label">Nombre</label>
-                            <input type="text" class="form-control" name="nombre" id="nombre" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="apellido" class="form-label">Apellido</label>
-                            <input type="text" class="form-control" name="apellido" id="apellido" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edad" class="form-label">Edad</label>
-                            <input type="number" class="form-control" name="edad" id="edad" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="correo" class="form-label">Correo Electrónico</label>
-                            <input type="email" class="form-control" name="correo" id="correo" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Contraseña</label>
-                            <input type="password" class="form-control" name="password" id="password" required>
-                        </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">Registrarse</button>
-                        </div>
-                    </form>
-                    <p class="mt-3 text-center">¿Ya tienes una cuenta? <a href="login.php">Inicia sesión aquí</a></p>
-                </div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Happy Paws</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; padding-top: 50px; }
+        .form-container { background: white; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); padding: 30px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 form-container">
+                <h2 class="text-center mb-4">Registro de Usuario</h2>
+                <?php if (!empty($mensaje)) echo $mensaje; ?>
+                
+                <form method="POST" action="">
+                    <!-- Nombre -->
+                    <div class="mb-3">
+                        <label class="form-label">Nombre:</label>
+                        <input type="text" name="nombre" class="form-control" required minlength="2">
+                    </div>
+                    
+                    <!-- Apellido -->
+                    <div class="mb-3">
+                        <label class="form-label">Apellido:</label>
+                        <input type="text" name="apellido" class="form-control" required>
+                    </div>
+                    
+                    <!-- Edad -->
+                    <div class="mb-3">
+                        <label class="form-label">Edad:</label>
+                        <input type="number" name="edad" class="form-control" min="18" max="100" required>
+                    </div>
+                    
+                    <!-- Correo -->
+                    <div class="mb-3">
+                        <label class="form-label">Correo:</label>
+                        <input type="email" name="correo" class="form-control" required>
+                    </div>
+                    
+                    <!-- Contraseña -->
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña:</label>
+                        <input type="password" name="contrasena" class="form-control" required minlength="8">
+                        <small class="text-muted">Mínimo 8 caracteres</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">Registrarse</button>
+                </form>
             </div>
         </div>
     </div>
-</div>
 
-<?php require_once '../includes/footer.php'; ?>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+<?php
+$conn->close();
+?>
