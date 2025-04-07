@@ -19,14 +19,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $contrasena = $_POST['contrasena']; // Contraseña sin cifrar (como solicitaste)
     
     // Validar credenciales
-    $sql = "SELECT * FROM usuarios WHERE correo = ? AND contrasena = ?";
+    $sql = "SELECT id, nombre FROM usuarios WHERE correo = ? AND contrasena = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ss", $correo, $contrasena);
     $stmt->execute();
     $result = $stmt->get_result();
     
     if ($result->num_rows > 0) {
-        // Credenciales correctas - redirigir a video.php
+        // Credenciales correctas
+        $usuario = $result->fetch_assoc();
+        
+        // INICIAR SESIÓN - Aquí colocamos el código nuevo
+        session_start();
+        $_SESSION['usuario_id'] = $usuario['id'];
+        $_SESSION['usuario_nombre'] = $usuario['nombre']; // También guardamos el nombre para mostrarlo
+        
+        // Redirigir a video.php
         header("Location: video.php");
         exit();
     } else {
