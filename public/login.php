@@ -296,7 +296,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <span class="fw-bold">Happy Paws</span>
                 </a>
                 <div class="d-none d-md-block">
-                    <span class="me-3"><i class="fas fa-phone me-2"></i>(56)3185964245</span>
+                    <span class="me-3"><i class="fas fa-phone me-2"></i>(57) 320-2243497</span>
                     <span><i class="fas fa-map-marker-alt me-2"></i>Universidad Militar Nueva Granada</span>
                 </div>
             </div>
@@ -378,14 +378,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                     <div class="col-md-4">
                         <h5>Contacto</h5>
-                        <p><i class="fas fa-phone me-2"></i>(57)3189564215</p>
+                        <p><i class="fas fa-phone me-2"></i>(57) 320-2243497</p>
                         <p><i class="fas fa-envelope me-2"></i>est.daniel.bueno@unimilitar.edu.co</p>
                         <p><i class="fas fa-map-marker-alt me-2"></i>Universida Militar Nueva Granada</p>
                     </div>
                 </div>
                 <hr class="my-4 bg-light opacity-25">
                 <div class="text-center">
-                    <p class="mb-0">&copy; 2023 Happy Paws Veterinaria Canina. Todos los derechos reservados.</p>
+                    <p class="mb-0">&copy; 2025 Happy Paws Veterinaria Canina. Todos los derechos reservados.</p>
                 </div>
             </div>
         </footer>
