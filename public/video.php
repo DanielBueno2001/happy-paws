@@ -255,6 +255,12 @@ $video_id = "1mIjV_oVm_Br9z9Q7dbsVeYqrDyPLxJiN";
                         <i class="fas fa-home me-2"></i>Volver al Inicio
                     </a>
                 </div>
+                
+                
+                </div>
+            </section>
+        </main>
+
         <!-- Footer section -->
         <footer class="footer_section">
             <div class="container">
