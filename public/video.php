@@ -128,10 +128,22 @@ $conn->close();
         }
         
         .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* Relación 16:9 */
+            height: 0;
+            overflow: hidden;
             margin: 2rem 0;
             border-radius: 10px;
-            overflow: hidden;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
         }
         
         .dog-paw {
@@ -218,18 +230,20 @@ $conn->close();
                     <h3><i class="fas fa-video me-2"></i>Video Educativo</h3>
                 </div>
                 
-                <!-- Contenedor del video -->
+                <!-- Contenedor del video desde SharePoint -->
                 <div class="video-container">
-                    <!-- Reemplaza "ruta/a/tu/video.mp4" con la ubicación real de tu video -->
-                    <video controls width="100%" poster="https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80">
-                        <source src="assets/cuidado-perros.mp4" type="video/mp4">
-                        Tu navegador no soporta el elemento de video.
-                    </video>
+                    <iframe 
+                        src="https://unimilitareduco-my.sharepoint.com/personal/est_daniel_bueno_unimilitar_edu_co/_layouts/15/embed.aspx?UniqueId=6f805dc8-8290-4eb7-95e8-86aa1ffc1c16&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" 
+                        allowfullscreen 
+                        title="Video educativo sobre cuidado de perros">
+                    </iframe>
                 </div>
                 
                 <div class="action-buttons">
                     <!-- Botón para descargar el video -->
-                    <a href="assets/videos/cuidado-perros.mp4" download="Cuidado-de-Perros-Happy-Paws.mp4" class="btn btn-primary">
+                    <a href="https://unimilitareduco-my.sharepoint.com/personal/est_daniel_bueno_unimilitar_edu_co/_layouts/15/download.aspx?UniqueId=6f805dc8-8290-4eb7-95e8-86aa1ffc1c16" 
+                       class="btn btn-primary" 
+                       download="Cuidado-de-Perros-Happy-Paws.mp4">
                         <i class="fas fa-download me-2"></i>Descargar Video
                     </a>
                     
@@ -237,6 +251,11 @@ $conn->close();
                     <a href="index.php" class="btn btn-outline-primary">
                         <i class="fas fa-home me-2"></i>Volver al Inicio
                     </a>
+                </div>
+                
+                <!-- Mensaje alternativo si el video no carga -->
+                <div class="alert alert-info mt-3">
+                    Si el video no se carga correctamente, <a href="https://unimilitareduco-my.sharepoint.com/personal/est_daniel_bueno_unimilitar_edu_co/_layouts/15/download.aspx?UniqueId=6f805dc8-8290-4eb7-95e8-86aa1ffc1c16" target="_blank">haz clic aquí para descargarlo</a>
                 </div>
             </section>
         </main>
