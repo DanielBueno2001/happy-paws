@@ -20,6 +20,9 @@ $usuario = $result->fetch_assoc();
 $nombre_usuario = $usuario['nombre'];
 $stmt->close();
 $conn->close();
+
+// ID de tu video en Google Drive (extraído de tu enlace)
+$video_id = "1mIjV_oVm_Br9z9Q7dbsVeYqrDyPLxJiN";
 ?>
 
 <!DOCTYPE html>
@@ -230,18 +233,18 @@ $conn->close();
                     <h3><i class="fas fa-video me-2"></i>Video Educativo</h3>
                 </div>
                 
-                <!-- Contenedor del video desde SharePoint -->
+                <!-- Contenedor del video desde Google Drive -->
                 <div class="video-container">
                     <iframe 
-                        src="https://unimilitareduco-my.sharepoint.com/personal/est_daniel_bueno_unimilitar_edu_co/_layouts/15/embed.aspx?UniqueId=6f805dc8-8290-4eb7-95e8-86aa1ffc1c16&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" 
-                        allowfullscreen 
+                        src="https://drive.google.com/file/d/<?php echo $video_id; ?>/preview" 
+                        allowfullscreen
                         title="Video educativo sobre cuidado de perros">
                     </iframe>
                 </div>
                 
                 <div class="action-buttons">
                     <!-- Botón para descargar el video -->
-                    <a href="https://unimilitareduco-my.sharepoint.com/personal/est_daniel_bueno_unimilitar_edu_co/_layouts/15/download.aspx?UniqueId=6f805dc8-8290-4eb7-95e8-86aa1ffc1c16" 
+                    <a href="https://drive.google.com/uc?export=download&id=<?php echo $video_id; ?>" 
                        class="btn btn-primary" 
                        download="Cuidado-de-Perros-Happy-Paws.mp4">
                         <i class="fas fa-download me-2"></i>Descargar Video
@@ -255,7 +258,7 @@ $conn->close();
                 
                 <!-- Mensaje alternativo si el video no carga -->
                 <div class="alert alert-info mt-3">
-                    Si el video no se carga correctamente, <a href="https://unimilitareduco-my.sharepoint.com/personal/est_daniel_bueno_unimilitar_edu_co/_layouts/15/download.aspx?UniqueId=6f805dc8-8290-4eb7-95e8-86aa1ffc1c16" target="_blank">haz clic aquí para descargarlo</a>
+                    Si el video no se carga correctamente, <a href="https://drive.google.com/file/d/<?php echo $video_id; ?>/view" target="_blank">haz clic aquí para verlo directamente en Google Drive</a>
                 </div>
             </section>
         </main>
