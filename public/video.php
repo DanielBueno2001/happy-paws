@@ -222,7 +222,7 @@ $conn->close();
                 <div class="video-container">
                     <!-- Reemplaza "ruta/a/tu/video.mp4" con la ubicación real de tu video -->
                     <video controls width="100%" poster="https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80">
-                        <source src="assets/videos/cuidado-perros.mp4" type="video/mp4">
+                        <source src="assets/cuidado-perros.mp4" type="video/mp4">
                         Tu navegador no soporta el elemento de video.
                     </video>
                 </div>
