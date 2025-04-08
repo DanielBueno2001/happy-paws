@@ -255,14 +255,6 @@ $video_id = "1mIjV_oVm_Br9z9Q7dbsVeYqrDyPLxJiN";
                         <i class="fas fa-home me-2"></i>Volver al Inicio
                     </a>
                 </div>
-                
-                <!-- Mensaje alternativo si el video no carga -->
-                <div class="alert alert-info mt-3">
-                    Si el video no se carga correctamente, <a href="https://drive.google.com/file/d/<?php echo $video_id; ?>/view" target="_blank">haz clic aquí para verlo directamente en Google Drive</a>
-                </div>
-            </section>
-        </main>
-
         <!-- Footer section -->
         <footer class="footer_section">
             <div class="container">
